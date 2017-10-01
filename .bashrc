@@ -23,3 +23,12 @@ YELLOW='\e[1;33m'
 LIGHT_GRAY='\e[0;37m'
 WHITE='\e[1;37m'
 DEFAULT_COLOR='\e[0m'
+
+# Determine hostnamme
+if [ -f /etc/release ]; then
+  grep "Solaris" /etc/release >/dev/null 2>&1 && MY_OS="SunOS"
+	[ "${MY_OS}" = "SunOS" ] && MY_HOSTNAME=`cat /etc/nodename` || MY_HOSTNAME="unknown"
+else
+	MY_HOSTNAME=`hostname -s 2>/dev/null` || MY_HOSTNAME=`hostname` || MY_HOSTNAME="unknown"
+  FQDN=`hostname`
+fi
