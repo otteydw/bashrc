@@ -41,3 +41,13 @@ fi
 PERIOD_COUNT=
 
 echo ${FQDN} | grep -q ".home$" && DATACENTER="Home"
+
+# Set email address based on the datacenter.  Default to work email.
+case ${DATACENTER} in
+  "Home" )
+    EMAIL_ADDRESS="dan@bluefrogs.us"
+  ;;
+  * )
+    EMAIL_ADDRESS="dan_ottey@dell.com"
+	;;
+esac
