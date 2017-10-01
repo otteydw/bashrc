@@ -33,6 +33,9 @@ else
   FQDN=`hostname`
 fi
 
+# Determine if we're using CYGWIN
+uname | grep -q "CYGWIN" && MY_OS="CYGWIN"
+
 # Try to determine datacenter name based on format of FQDN...  SERVERNAME.DATACENTER.DOMAIN.TLD
 PERIOD_COUNT=`echo ${FQDN} | tr -d -c '.\n' | awk '{ print length; }'`
 if [ ${PERIOD_COUNT} -eq 3 ]; then
