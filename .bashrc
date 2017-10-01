@@ -72,5 +72,34 @@ else
     export TERM='linux'
   fi
 
+  if [ "${MY_OS}" = "CYGWIN" ]; then
+    if [ -e ${HOME}/.ssh/config ]; then
+      alias ssh="ssh -F ${HOME}/.ssh/config"
+      alias scp="scp -F ${HOME}/.ssh/config"
+    fi
+    NOTEPAD="/c/Program Files//Notepad++/notepad++.exe"
+    if [ -x "${NOTEPAD}" ]; then
+      alias notepad="${NOTEPAD}"
+      alias vi="${NOTEPAD}"
+    fi
+    [ -x /cygdrive/c/Windows/system32/ping ] && alias ping="/cygdrive/c/Windows/system32/ping"
+    alias goog="lynx -auth=dan_ottey www.google.com"
+    alias iplist='ipconfig | grep --color=never Address'
+    [ -d /cygdrive/c/cmdline ] && export PATH="/cygdrive/c/cmdline:${PATH}"
+    # Launch "Active Directory Users and Computers"
+    alias labdsa='runas /user:dottey@LAB "mmc ${WINDIR}\system32\dsa.msc"'
+    alias ifconfig='ipconfig'
+    alias df='df -kTH'
+    #alias network_reset="ipconfig /release; ipconfig /renew"
+    #alias wireless="ipconfig /release *LAN*"
+    #alias lan="ipconfig /release *Wireless*"
+    [ -e /c/downloads ] && alias downloads="cd /c/downloads"
+    alias cls='echo -e -n "\E[2J"'
+    /usr/bin/which clear >/dev/null 2>&1 || alias clear='cls'
+    alias red="netsh wlan connect name=red"
+    alias east="netsh wlan connect name=east"
+    alias slack_kill="powershell kill -n slack"
+  fi
+
   PS1="[\$(date +%H%M%Z)]\[${LIGHT_RED}\][${PS_FILLER}]\[${LIGHT_CYAN}\][\u\[${YELLOW}\]@\h:\[${LIGHT_PURPLE}\]\w]\[${WHITE}\]$\[${WHITE}\]"
 fi
