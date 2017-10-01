@@ -101,5 +101,17 @@ else
     alias slack_kill="powershell kill -n slack"
   fi
 
+  if [ "${MY_OS}" = "CYGWIN" ]; then
+    #PS1="[\$(date +%H%M%Z)]\[${LIGHT_RED}\][Cygwin]\[${LIGHT_CYAN}\][\u\[${YELLOW}\]@\h:\[${LIGHT_PURPLE}\]\w]\[${WHITE}\]$\[${WHITE}\]"
+    PS_FILLER="Cygwin"
+  elif [ "a${DATACENTER}" != "a" ]; then
+    PS_FILLER="${DATACENTER}"
+  else
+    #if [ `hostname | tr -d -c '.' | awk '{ print length; }'` -gt 1 ]; then
+    # First 3 letters of hostname
+    #PS_FILLER=`echo ${MY_HOSTNAME} | cut -c -3 | tr [:lower:] [:upper:]`
+    PS_FILLER="${DATACENTER}"
+  fi
+
   PS1="[\$(date +%H%M%Z)]\[${LIGHT_RED}\][${PS_FILLER}]\[${LIGHT_CYAN}\][\u\[${YELLOW}\]@\h:\[${LIGHT_PURPLE}\]\w]\[${WHITE}\]$\[${WHITE}\]"
 fi
