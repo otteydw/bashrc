@@ -39,3 +39,5 @@ if [ ${PERIOD_COUNT} -eq 3 ]; then
   DATACENTER=`echo ${FQDN} | awk -F. {'print $2'} | tr [:lower:] [:upper:]`
 fi
 PERIOD_COUNT=
+
+echo ${FQDN} | grep -q ".home$" && DATACENTER="Home"
