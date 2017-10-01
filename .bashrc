@@ -54,3 +54,23 @@ case ${DATACENTER} in
     EMAIL_ADDRESS="dan_ottey@dell.com"
 	;;
 esac
+
+if [ "${MY_OS}" = "SunOS" ]; then
+  if [ -t 0 ]; then
+    export TERM=vt220
+    PS1="[\$(date +%H%M%Z)]\[${LIGHT_RED}\][SunOS]\[${LIGHT_CYAN}\][\u\[${YELLOW}\]@\h:\[${LIGHT_PURPLE}\]\w]\[${WHITE}\]$\[${WHITE}\]"
+    /usr/bin/stty columns 120
+    /usr/bin/stty erase ^H
+    #return
+  fi
+else
+  if [ -e /usr/share/terminfo/x/xterm-256color ]; then
+    export TERM='xterm-256color'
+  elif [ -e /usr/share/terminfo/x/xterm ]; then
+    export TERM='xterm'
+  else
+    export TERM='linux'
+  fi
+
+  PS1="[\$(date +%H%M%Z)]\[${LIGHT_RED}\][${PS_FILLER}]\[${LIGHT_CYAN}\][\u\[${YELLOW}\]@\h:\[${LIGHT_PURPLE}\]\w]\[${WHITE}\]$\[${WHITE}\]"
+fi
