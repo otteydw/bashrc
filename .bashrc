@@ -690,6 +690,14 @@ function atom-pause {
   sudo su - ${USERNAME} -c "/usr/local/boomi/cloud/jmxutil/jmx_invoke.sh ${PID} com.boomi.container.services:type=ContainerController changeStatusAsync PAUSED_FOR_STOP"
 }
 
+function atomclouduptime {
+  for NUM in `seq -w 1 14`; do SERVER="dfwatom${NUM}.dfw.boomi.com"; echo -en "${SERVER}\t";ssh ${SERVER} "uptime" 2>/dev/null; done
+}
+
+function labqaatomclouduptime {
+  for NUM in `seq -w 1 12`; do SERVER="labqaatom${NUM}.lab.boomi.com"; echo -en "${SERVER}\t";ssh ${SERVER} "uptime" 2>/dev/null; done
+}
+
 function msepoch_to_date {
     MS=$1
     date -d @$(  echo "(${MS} + 500) / 1000" | bc)
@@ -741,6 +749,14 @@ function mailcount ()
   defer=`sudo find $qdir/defer -type f -print | wc -l | awk '{print $1}'`
   deferred=`sudo find $qdir/deferred -type f -print | wc -l | awk '{print $1}'`
   printf "active: %d\ndefer: %d\ndeferred: %d\nincoming: %d\nactiveonly: %d\nmaildrop: %d\n" $active $defer $deferred $incoming $activeonly $maildrop
+}
+
+function db-report {
+  CONNECT=$1
+  STAMP="`date +%Y%m%d-%H%M%S`_`hostname -s`"
+  REPORT="${STAMP}-db_report.txt"
+  [ -f ~/.my.cnf ] || DO_SUDO="sudo"
+  ${DO_SUDO} mysql ${CONNECT} -e "SELECT * FROM information_schema.innodb_locks\G; SELECT * FROM information_schema.innodb_trx\G; show engine innodb status\G; SHOW FULL PROCESSLIST\G;" > ${REPORT} && echo "Report written to ${REPORT}" >&2 || echo "Problem with running the report!" >&2
 }
 
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
