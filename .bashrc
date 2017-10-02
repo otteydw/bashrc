@@ -146,3 +146,12 @@ alias tree='tree -Csu'          # nice alternative to 'ls'
 alias useradd='/usr/sbin/useradd'
 alias usermod='/usr/sbin/usermod'
 alias userdel='/usr/sbin/userdel'
+
+# Aliases for the ssh agent
+agt () {
+	eval `ssh-agent`
+}
+
+alias keyon="ssh-add -t 10800"
+alias keyoff='ssh-add -D'
+alias keylist='ssh-add -l'
