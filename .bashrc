@@ -759,6 +759,21 @@ function db-report {
   ${DO_SUDO} mysql ${CONNECT} -e "SELECT * FROM information_schema.innodb_locks\G; SELECT * FROM information_schema.innodb_trx\G; show engine innodb status\G; SHOW FULL PROCESSLIST\G;" > ${REPORT} && echo "Report written to ${REPORT}" >&2 || echo "Problem with running the report!" >&2
 }
 
+# Determine WAN IP based on available utilities.
+if [ -x /usr/bin/wget ] || which wget > /dev/null 2>&1; then
+  #alias wanip='wget -O - -q icanhazip.com'
+  #alias wanip='wget -O - -q ifconfig.me/ip'
+  alias wanip='wget -O - -q ipinfo.io/ip'
+elif [ -x /usr/bin/curl ]; then
+  #alias wanip='curl icanhazip.com'
+  #alias wanip='curl ifconfig.me/ip'
+  alias wanip='curl ipinfo.io/ip'
+elif [ -x /usr/bin/dig ]; then
+  alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+else
+  alias wanip='echo "No available tool!"'
+fi
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
