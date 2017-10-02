@@ -281,5 +281,36 @@ function colortable () {
 
 alias colors=colortable
 
+alias certfileinspect='openssl x509 -text -noout -in'
+complete -f -o default -X '!*.crt' certfileinspect
+
+function certurldownload {
+  # $1 should be in form www.domain.com:443
+  SERVERNAME=$(echo $1 | awk -F: {'print $1'})
+  PORT=$(echo $1 | awk -F: {'print $2'})
+  [ -z "${PORT}" ] && PORT="443"
+  openssl s_client -showcerts -servername ${SERVERNAME} -connect ${SERVERNAME}:${PORT} </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
+}
+
+function certurlinspect {
+  # $1 should be in form www.domain.com:443
+  # Support SNI (-servername)
+  certurldownload $1 | openssl x509 -text -noout
+}
+
+function csr_inspect {
+  openssl req -in $1 -noout -text
+}
+
+function cert_verify {
+  CA_BUNDLE=$1
+  CERT=$2
+  openssl verify -CAfile /etc/pki/tls/cert.pem -untrusted ${CA_BUNDLE} ${CERT}
+}
+
+function certftpinspect {
+  openssl s_client -showcerts -connect $1 -starttls ftp </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl x509 -text -noout
+}
+
 # Source a local bashrc if one exists.
 [ -e ${HOME}/.bashrc.local ] && source ${HOME}/.bashrc.local
