@@ -866,6 +866,9 @@ VIMRC="${HOME}/.vimrc"
 alias get_vimrc="curl -s -o ${VIMRC} https://otteydw.keybase.pub/linux/.vimrc"
 [ -f "${VIMRC}" ] || get_vimrc
 
+# Source bash autocompletion for the rack cli
+[ -e ${HOME}/.rack/bash_autocomplete ] && source ${HOME}/.rack/bash_autocomplete
+
 # Send a test email
 function testmail () {
   MESSAGE="Test from ${MY_HOSTNAME}"
