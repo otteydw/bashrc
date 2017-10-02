@@ -845,6 +845,19 @@ function sar_8hours ()
   sudo sar -A -o ~/`datestamp`-`hostname`-8hour.sa 15 1920 > /dev/null 2>&1 &
 }
 
+# Send a test email
+function testmail () {
+  MESSAGE="Test from ${MY_HOSTNAME}"
+  if [ -x /usr/bin/mutt ]; then
+    echo "${MESSAGE}" | /usr/bin/mutt -s "${MESSAGE}" -- ${EMAIL_ADDRESS}
+  elif [ -x /bin/mail ]; then
+    echo "${MESSAGE}" | /bin/mail -s "${MESSAGE}" ${EMAIL_ADDRESS}
+  else
+    echo "Error: no /bin/mail or /usr/bin/mutt present."
+    exit 1
+  fi
+}
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
