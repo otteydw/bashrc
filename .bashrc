@@ -134,6 +134,8 @@ alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
 alias numeric_permissions="stat -c '%a %n'"
 alias partition="echo '1,,' | sudo sfdisk -uM "
 alias cputest='openssl speed -multi'
+alias miu='/bin/ps -eo rss | awk '\''{SUM += $1} END {print SUM/1024 " - Mebibytes in Memory Used"}'\'''
+#alias auto_emcgrab="cd ~/emcgrab; sudo ./emcgrab.sh -legal -autoexec"
 
 # Boomi-specific aliases
 [ -x /usr/local/scripts/atomview.sh ] && alias atomview="sudo watch -n5 /usr/local/scripts/atomview.sh"
