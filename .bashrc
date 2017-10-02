@@ -527,6 +527,47 @@ function atom-pause {
   USERNAME="`ps --no-header -p ${PID} -o user`"
   sudo su - ${USERNAME} -c "/usr/local/boomi/cloud/jmxutil/jmx_invoke.sh ${PID} com.boomi.container.services:type=ContainerController changeStatusAsync PAUSED_FOR_STOP"
 }
+
+function msepoch_to_date {
+    MS=$1
+    date -d @$(  echo "(${MS} + 500) / 1000" | bc)
+}
+
+function dmesg_with_human_timestamps () {
+  $(type -P dmesg) "$@" | perl -w -e 'use strict;
+    my ($uptime) = do { local @ARGV="/proc/uptime";<>}; ($uptime) = ($uptime =~ /^(\d+)\./);
+    foreach my $line (<>) {
+      printf( ($line=~/^\[\s*(\d+)\.\d+\](.+)/) ? ( "[%s]%s\n", scalar localtime(time - $uptime + $1), $2 ) : $line )
+    }'
+}
+
+function datediff {
+  firstdate=$1;
+  secondate=$2;
+
+  fullyear=$(date -d@$(( ( $(date -ud "$secondate" +'%s') - $(date -ud "$firstdate" +'%s') ) )) +'%Y years %m months %d days %H hours %M minutes %S seconds')
+  yearsubtraction=$(( $(echo $fullyear | sed -r 's/^([0-9]+).*/\1/') - 1970 ))
+
+  if [ $yearsubtraction -le '0' ]; then
+    echo $fullyear | sed -r "s/^([0-9]+) years //"
+  else
+    echo $fullyear | sed -r "s/^([0-9]+) /$(printf %02d $yearsubtraction) /"
+  fi
+}
+
+function driveclientkill {
+  sudo kill -9 $(pidof driveclient)
+}
+
+function modtimerename ()
+{
+  OLDFILE=$1
+  MODTIME=`stat ${OLDFILE} --format %y | awk -F. {'print $1'} | sed -e "s|\:|\.|g"`
+  EXT=`echo ${OLDFILE} | awk -F . '{print $NF}'`
+  NEWFILE="${MODTIME}.${EXT}"
+  mv "${OLDFILE}" "${NEWFILE}"
+}
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
