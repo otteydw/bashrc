@@ -133,6 +133,7 @@ alias splunk_tail_status="curl -u admin -k https://localhost:8089/services/admin
 alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
 alias numeric_permissions="stat -c '%a %n'"
 alias partition="echo '1,,' | sudo sfdisk -uM "
+alias cputest='openssl speed -multi'
 
 # Boomi-specific aliases
 [ -x /usr/local/scripts/atomview.sh ] && alias atomview="sudo watch -n5 /usr/local/scripts/atomview.sh"
@@ -300,6 +301,23 @@ if [ "${MY_OS}" != "SunOS" ]; then
 	alias rm='rm -iv'
 	alias cp='cp -iv'
 	alias mv='mv -iv'
+
+  alias rpmreport='rpm -qa | sort | xargs rpm -q --qf "%{NAME}-%{VERSION}-%{RELEASE} \| %{ARCH} \| %{VENDOR} \| %{INSTALLTIME:date} \n"'
+  alias rpm_name_and_arch='rpm -qa | xargs rpm -q --qf "%{NAME}\.%{ARCH} \n" | sort -u'
+  alias get_serial_number='sudo /usr/sbin/dmidecode -s system-serial-number'
+
+  if [ "${MY_OS}" = "RHEL5" ]; then
+    alias mydstat='dstat -tclmdy -N total -M topio --noupdate 5'
+  else
+    alias mydstat='dstat -tclmdy -N total -M topio --socket --noupdate 5'
+  fi
+
+  function hardware_model ()
+  {
+    MANUFACTURER=`sudo dmidecode -s system-manufacturer`
+    PRODUCT=`sudo dmidecode -s system-product-name`
+    echo "${MANUFACTURER} ${PRODUCT}"
+  }
 
 fi
 
