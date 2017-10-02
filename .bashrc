@@ -328,6 +328,11 @@ function certftpinspect {
   openssl s_client -showcerts -connect $1 -starttls ftp </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl x509 -text -noout
 }
 
+# Function to remove comments from a file. (expects a file name as input)
+function remove_comments () {
+  grep -v '^#' $1 | grep -v '^$'
+}
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
