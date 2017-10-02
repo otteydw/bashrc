@@ -333,6 +333,88 @@ function remove_comments () {
   grep -v '^#' $1 | grep -v '^$'
 }
 
+function connections () {
+  netstat -an | awk '/tcp/ {print $6}' | sort | uniq -c
+}
+
+function psinfo () {
+  pidinfo `pidof $1`
+}
+
+function evenodd () {
+  # determine odd/even status by last digit
+  LAST_DIGIT=`echo $1 | sed 's/\(.*\)\(.\)$/\2/'`
+  case ${LAST_DIGIT} in
+  0|2|4|6|8)
+    return 1
+    ;;
+  *)
+    return 0
+    ;;
+  esac
+}
+
+function isalive () {
+  NODE=$1
+  /bin/ping -c 1 ${NODE} >/dev/null 2>&1 && return 0 || return 1
+}
+
+function sslthing () {
+  ossl=/usr/bin/openssl
+  tempfile=/tmp/sslthing.tmp
+
+	## Make a request (may be altered)
+  echo "GET / HTTP/1.0" > $tempfile
+
+	###### END OF CONFIGURATION #####
+
+	if ! [ $1 ]; then
+    echo syntax: $0 host:sslport [-v]
+    exit
+  fi
+
+	if ! [ -e $ossl ]; then
+	  echo The path to openssl is wrong, please edit $0
+	  exit
+	fi
+
+	## Request available ciphers from openssl and test them
+	for ssl in -ssl3 -tls1 -tls1_2
+	do
+	  echo
+	  echo Testing `echo $ssl | cut -c2- | tr "a-z" "A-Z"`...
+	  $ossl ciphers $ssl -v | while read line
+	  do
+	    cipher=`echo $line | awk '{print $1}'`
+	    bits=`echo $line | awk '{print $5}' | cut -f2 -d\( | cut -f1 -d\)`
+      if [ $2 ]; then
+        echo -n $cipher - $bits bits...
+      fi
+
+	    if ($ossl s_client $ssl -cipher $cipher -connect $1 < $tempfile 2>&1 | grep ^New > /dev/null); then
+	      if [ $2 ]; then
+          echo OK
+	      else
+          echo $cipher - $bits bits
+	      fi
+      else
+        if [ $2 ]; then
+          echo Failed
+        fi
+      fi
+    done | grep -v error
+  done
+}
+
+function open_files_per_pid () {
+  for PID in `ps -ef | awk '{print $2}' | grep -v PID`
+  do
+    /bin/echo -en "${PID}  "
+    sudo lsof -p $PID | wc -l
+  done
+}
+
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
