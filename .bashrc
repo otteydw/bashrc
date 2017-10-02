@@ -224,7 +224,7 @@ function random_text_password () {
   fi
 }
 
-new_password () {
+function new_password () {
   NEW_USER=$1
   PASSWORD=`random_password`
   echo $PASSWORD | sudo /usr/bin/passwd --stdin $NEW_USER
@@ -235,7 +235,7 @@ new_password () {
   echo "Password: $PASSWORD"
 }
 
-reset_password () {
+function reset_password () {
   NEW_USER=$1
   PASSWORD='password'
   echo $PASSWORD | sudo /usr/bin/passwd --stdin $NEW_USER
@@ -246,7 +246,7 @@ reset_password () {
   echo "Password: $PASSWORD"
 }
 
-new_user () {
+funciton new_user () {
   if [ $# -ne 2 ]; then
     echo "new_user requires two args"
     exit 1
