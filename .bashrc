@@ -241,5 +241,17 @@ hoststampss () {
   echo "$(date +%Y%m%d-%H%M%S)-$(hostname -s)"
 }
 
+send_file_by_email () {
+  EMAIL_ADDRESS=$1
+  [ -x /usr/bin/mutt ] || ( echo "Mutt must be installed."; exit 1)
+  FILE=$2
+  [ -z "${FILE}" ] && ( echo "You must enter a filename to send."; exit 1 )
+  [ -e "${FILE}" ] || ( echo "${FILE} does not exist."; exit 1 )
+  [ -x /usr/bin/mutt ] || ( echo "/usr/bin/mutt does exist or is not executable."; exit 1 )
+  /usr/bin/mutt -s "${FILE}" -a "${FILE}" -- ${EMAIL_ADDRESS} < /dev/null
+}
+
+alias email_me="send_file_by_email ${EMAIL_ADDRESS} $2"
+
 # Source a local bashrc if one exists.
 [ -e ${HOME}/.bashrc.local ] && source ${HOME}/.bashrc.local
