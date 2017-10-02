@@ -845,6 +845,16 @@ function sar_8hours ()
   sudo sar -A -o ~/`datestamp`-`hostname`-8hour.sa 15 1920 > /dev/null 2>&1 &
 }
 
+function is_aws {
+  curl --connect-timeout 2 http://169.254.169.254/latest/meta-data/ >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    echo "Yes" >&2
+    return 0
+  else
+    echo "No" >&2
+    return 1
+  fi
+}
 # function asm_header ()
 # {
 #   sudo dd if=$1 bs=512 count=1
