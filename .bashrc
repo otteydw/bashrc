@@ -776,6 +776,75 @@ else
   alias wanip='echo "No available tool!"'
 fi
 
+alias sar="LANG=C sar"
+
+function sar_rename ()
+{
+  FILENAME=$1
+  if [ "${FILENAME}" == "" ]; then
+    echo "Missing FILENAME(s)."
+    return 1
+  fi
+  SAR_HOST=`LANG=C /usr/bin/sar -f ${FILENAME} | head -n1 | awk {'print $3'} | sed -e "s|(||" -e "s|)||"`
+  SAR_DATE_SLASHES=`LANG=C sar -f ${FILENAME} | head -n1 | awk {'print $4'}`
+  SAR_DATE_STAMP=`date --date "${SAR_DATE_SLASHES}" +%Y%m%d`
+  BASE="${SAR_HOST}_${SAR_DATE_STAMP}"
+  mv ${FILENAME} ${BASE}.sa
+}
+
+function sar_extracts ()
+{
+  FILENAME=$1
+  if [ "${FILENAME}" == "" ]; then
+    echo "Missing FILENAME."
+    return 1
+  fi
+  SAR_HOST=`LANG=C /usr/bin/sar -f ${FILENAME} | head -n1 | awk {'print $3'} | sed -e "s|(||" -e "s|)||"`
+  SAR_DATE_SLASHES=`LANG=C sar -f ${FILENAME} | head -n1 | awk {'print $4'}`
+  SAR_DATE_STAMP=`date --date "${SAR_DATE_SLASHES}" +%Y%m%d`
+  BASE="${SAR_HOST}_${SAR_DATE_STAMP}"
+  LANG=C /usr/bin/sar -f ${FILENAME} > "${BASE}_cpu.txt"
+  LANG=C /usr/bin/sar -r -f ${FILENAME} > "${BASE}_mem.txt"
+  LANG=C /usr/bin/sar -q -f ${FILENAME} > "${BASE}_loadavg.txt"
+  LANG=C /usr/bin/sar -b -f ${FILENAME} > "${BASE}_io.txt"
+  LANG=C /usr/bin/sar -n DEV -f ${FILENAME} > "${BASE}_net.txt"
+  LANG=C /usr/bin/sar -n EDEV -f ${FILENAME} > "${BASE}_neterr.txt"
+  TMP_TIMESTAMPS=`/bin/mktemp -p .`
+  TMP_CPU=`/bin/mktemp -p .`
+  TMP_MEM=`/bin/mktemp -p .`
+  TMP_LOADAVG=`/bin/mktemp -p .`
+  TMP_IO=`/bin/mktemp -p .`
+  cat ${BASE}_cpu.txt | sed -n '3,$ p' | sed '$d' | awk {'print $1'} > ${TMP_TIMESTAMPS}
+  cat ${BASE}_cpu.txt | sed -n '3,$ p' | sed '$d' | cut -f2- -d ' ' > ${TMP_CPU}
+  cat ${BASE}_mem.txt | sed -n '3,$ p' | sed '$d' | cut -f2- -d ' ' > ${TMP_MEM}
+  cat ${BASE}_loadavg.txt | sed -n '3,$ p' | sed '$d' | cut -f2- -d ' ' > ${TMP_LOADAVG}
+  cat ${BASE}_io.txt | sed -n '3,$ p' | sed '$d' | cut -f2- -d ' ' > ${TMP_IO}
+  # KEEP DOUBLE SPACE AFTER -s\ option
+  /usr/bin/pr -J -m -t -s\  "${TMP_TIMESTAMPS}" "${TMP_CPU}" "${TMP_MEM}" "${TMP_LOADAVG}" "${TMP_IO}" > "${BASE}_combined.txt"
+  /bin/rm -f ${TMP_TIMESTAMPS} ${TMP_CPU} ${TMP_MEM} ${TMP_LOADAVG} ${TMP_IO}
+
+  for NET_DEV in `cat ${BASE}_net.txt | tail -n+4 | grep -v "^Average" | awk {'print $2'} | sort -u`
+  do
+    NET_FILE="${BASE}_net_${NET_DEV}.txt"
+    cat ${BASE}_net.txt | head -n3 | tail -n1 > ${NET_FILE}
+    cat ${BASE}_net.txt | sed -n '3,$ p' | grep ${NET_DEV} | grep -v "^Average" >> ${NET_FILE}
+
+    NET_FILE="${BASE}_neterr_${NET_DEV}.txt"
+    cat ${BASE}_neterr.txt | head -n3 | tail -n1 > ${NET_FILE}
+    cat ${BASE}_neterr.txt | sed -n '3,$ p' | grep ${NET_DEV} | grep -v "^Average" >> ${NET_FILE}
+  done
+}
+
+function sar_4hours ()
+{
+  sudo sar -A -o ~/`datestamp`-`hostname`-4hour.sa 5 2880 > /dev/null 2>&1 &
+}
+
+function sar_8hours ()
+{
+  sudo sar -A -o ~/`datestamp`-`hostname`-8hour.sa 15 1920 > /dev/null 2>&1 &
+}
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
