@@ -586,6 +586,19 @@ function modtimerename ()
   mv "${OLDFILE}" "${NEWFILE}"
 }
 
+# Display readable counts from postfix mailqueue
+function mailcount ()
+{
+  qdir=`postconf -h queue_directory`
+  incoming=`sudo find $qdir/incoming -type f -print | wc -l | awk '{print $1}'`
+  activeonly=`sudo find $qdir/active -type f -print | wc -l | awk '{print $1}'`
+  maildrop=`sudo find $qdir/maildrop -type f -print | wc -l | awk '{print $1}'`
+  active=`sudo find $qdir/incoming $qdir/active $qdir/maildrop -type f -print | wc -l | awk '{print $1}'`
+  defer=`sudo find $qdir/defer -type f -print | wc -l | awk '{print $1}'`
+  deferred=`sudo find $qdir/deferred -type f -print | wc -l | awk '{print $1}'`
+  printf "active: %d\ndefer: %d\ndeferred: %d\nincoming: %d\nactiveonly: %d\nmaildrop: %d\n" $active $defer $deferred $incoming $activeonly $maildrop
+}
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
