@@ -224,3 +224,19 @@ function random_text_password () {
     return 1
   fi
 }
+
+datestamp () {
+  echo $(date +%Y%m%d-%H%M)
+}
+
+datestampss () {
+  echo $(date +%Y%m%d-%H%M%S)
+}
+
+hoststamp () {
+  echo "$(date +%Y%m%d-%H%M)-$(hostname -s)"
+}
+
+hoststampss () {
+  echo "$(date +%Y%m%d-%H%M%S)-$(hostname -s)"
+}
