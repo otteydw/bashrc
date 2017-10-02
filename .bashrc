@@ -127,6 +127,22 @@ alias pass_sort='sort -t: -k3 -n /etc/passwd'
 alias nmap_verbose='sudo nmap -sS -O -v -A -p1-65535 -T5'
 alias hogs="ps -eo pcpu,pid,user,args | sort -r -k1 | less"
 alias pidinfo="sudo /bin/ps -o pid,lstart,command -p"
+alias xterm="xterm -bg black -fg green -cr purple +cm +dc -geometry 80x20+100+50"
+alias iowait="ps ax | awk '\$3 ~ /^D/ { print \$0 }'"
+alias splunk_tail_status="curl -u admin -k https://localhost:8089/services/admin/inputstatus/TailingProcessor:FileStatus"
+alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
+alias numeric_permissions="stat -c '%a %n'"
+alias partition="echo '1,,' | sudo sfdisk -uM "
+
+# Boomi-specific aliases
+[ -x /usr/local/scripts/atomview.sh ] && alias atomview="sudo watch -n5 /usr/local/scripts/atomview.sh"
+alias container_count='ps aux | grep java | grep boomi | grep Container | grep -c -v grep'
+alias atomprocess_count='ps aux | grep java | grep boomi | grep -v Container | grep -c -v grep'
+
+
+# Elasticsearch aliases
+alias es_cluster_health="curl -XGET 'http://localhost:9200/_cluster/health?pretty' 2>/dev/null"
+alias es_cluster_status="curl -XGET 'http://localhost:9200/_cluster/health?pretty' 2>/dev/null | grep 'status' | sed -e 's|\"||g' -e 's|,||g' | awk -F': ' {'print \$2'}"
 
 # Assist in common typos
 alias Grep='grep'
