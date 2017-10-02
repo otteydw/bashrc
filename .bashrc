@@ -179,6 +179,130 @@ which most >/dev/null 2>&1 && {
   export PAGER='less -IX'
 }
 
+# These are Linux-only
+if [ "${MY_OS}" != "SunOS" ]; then
+
+  if [ -e /etc/redhat-release ]; then
+    grep -q "^Red Hat Linux Advanced Server release 2" /etc/redhat-release 2>/dev/null && export MY_OS="RHEL2"
+    grep -q "^Red Hat Enterprise Linux Server release 5" /etc/redhat-release 2>/dev/null && export MY_OS="RHEL5"
+    grep -q "^Red Hat Enterprise Linux Server release 6" /etc/redhat-release 2>/dev/null && export MY_OS="RHEL6"
+    grep -q "^Red Hat Enterprise Linux Server release 7" /etc/redhat-release 2>/dev/null && export MY_OS="RHEL7"
+    grep -q "^Fedora" /etc/redhat-release 2>/dev/null && export MY_OS="FEDORA"
+  elif [ -e /frontview ]; then
+    MY_OS="ReadyNAS"
+  fi
+
+	if [ "a${MY_OS}" = "a" ]; then
+    MY_OS="OS_UNKNOWN"
+  fi
+
+	#[ "$MY_OS" != "RHEL2" ] && export GREP_OPTIONS="--color"
+	# GREP_OPTIONS is deprecated
+  [ "${MY_OS}" != "RHEL2" ] && [ "${MY_OS}" != "ReadyNAS" ] && alias grep="grep --color"
+
+	alias rpmq='rpm -q --qf "%{NAME}-%{VERSION}-%{RELEASE} (%{ARCH})\n"'
+
+	rpm-extract () {
+    RPM=$1
+    /usr/bin/rpm2cpio $RPM | cpio -idmv
+	}
+
+	alias ipcalc="ipcalc -n"
+  #echo "MY_OS=${MY_OS}"
+	if [ "{$MY_OS}" != "CYGWIN" ]; then
+    [ -x /sbin/ip ] && alias iplist='/sbin/ip addr list | /bin/grep "inet "' || alias iplist='/sbin/ifconfig -a | /bin/grep "inet "'
+  fi
+
+	swap_percent() {
+    SWAP_LINE=`free | grep "^Swap"`
+    SWAP_USED=`echo ${SWAP_LINE} | awk {'print $3'}`
+    SWAP_TOTAL=`echo ${SWAP_LINE} | awk {'print $2'}`
+    AWKSCRIPT=' { printf( "%3.2f\n", $1*100/$2 ) }'
+    SWAP_PERCENT=`echo ${SWAP_USED} ${SWAP_TOTAL} | awk "${AWKSCRIPT}"`
+    echo "Swap is ${SWAP_PERCENT}% full."
+  }
+
+	tty | grep -qe "tty" && ON_TTY=0 || ON_TTY=1
+
+	if [ ${ON_TTY} -eq 0 ]; then
+    # On TTY
+    export TERM=linux
+    export GREP_COLOR=32
+  else
+    # On PTS
+    [ -t 0 ] && ps | grep 'bash' | awk {'print $2'} | grep 'pts' >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      # Strip 6 beginning digits for Boomi servers at Rackspace
+      MY_TITLE_NAME=`echo ${MY_HOSTNAME} | sed -e "s|^[[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]]-||g"`
+      export PROMPT_COMMAND='echo -ne "\033]2;${MY_TITLE_NAME}\007\033]1;${MY_TITLE_NAME}\007"'
+    fi
+    export GREP_COLOR='00;38;5;157'
+	fi
+
+	# Bash shell options and completions. (They just make life nicer)
+	shopt -s extglob        # necessary
+	shopt -s cdspell
+	shopt -s cdable_vars
+	shopt -s checkhash
+	shopt -s checkwinsize
+	shopt -s mailwarn
+	shopt -s sourcepath
+	shopt -s cmdhist
+	shopt -s histappend histreedit histverify
+
+	set +o nounset          # otherwise some completions will fail
+
+	complete -A hostname   rsh rcp telnet rlogin r ftp ping disk
+	complete -A export     printenv
+	complete -A variable   export local readonly unset
+	complete -A enabled    builtin
+	complete -A alias      alias unalias
+	complete -A function   function
+	complete -A user       su mail finger
+
+	complete -A helptopic  help     # currently same as builtins
+	complete -A shopt      shopt
+	complete -A stopped -P '%' bg
+	complete -A job -P '%'     fg jobs disown
+
+	complete -A directory  mkdir rmdir
+	complete -A directory   -o default cd
+
+	# Compression
+	complete -f -o default -X '*.+(zip|ZIP)'  zip
+	complete -f -o default -X '!*.+(zip|ZIP)' unzip
+	complete -f -o default -X '*.+(z|Z)'      compress
+	complete -f -o default -X '!*.+(z|Z)'     uncompress
+	complete -f -o default -X '*.+(gz|GZ)'    gzip
+	complete -f -o default -X '!*.+(gz|GZ)'   gunzip
+	complete -f -o default -X '*.+(bz2|BZ2)'  bzip2
+	complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
+
+	# Postscript,pdf,dvi.....
+	complete -f -o default -X '!*.ps'           gs ghostview ps2pdf ps2ascii
+	complete -f -o default -X '!*.dvi'          dvips dvipdf xdvi dviselect dvitype
+	complete -f -o default -X '!*.pdf'          acroread pdf2ps
+	complete -f -o default -X '!*.+(pdf|ps)'    gv
+	complete -f -o default -X '!*.texi*'        makeinfo texi2dvi texi2html texi2pdf
+	complete -f -o default -X '!*.tex'          tex latex slitex
+	complete -f -o default -X '!*.lyx'          lyx
+	complete -f -o default -X '!*.+(htm*|HTM*)' lynx html2ps
+	# Multimedia
+	complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
+	complete -f -o default -X '!*.+(mp3|MP3)'              mpg123 mpg321
+	complete -f -o default -X '!*.+(ogg|OGG)'              ogg123
+	complete -f -o default -X '!*.pl'                      perl perl5
+
+	# Enable tab complete for sudo commands
+	complete -cf sudo
+
+	# -> Prevents accidentally clobbering files.
+	alias rm='rm -iv'
+	alias cp='cp -iv'
+	alias mv='mv -iv'
+
+fi
+
 # Aliases for the ssh agent
 agt () {
 	eval `ssh-agent`
