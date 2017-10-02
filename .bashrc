@@ -414,6 +414,66 @@ function open_files_per_pid () {
   done
 }
 
+function lun_sort ()
+{
+  INQ="/usr/local/sbin/inq.LinuxAMD64"
+  [ -x ${INQ} ] && sudo ${INQ} -showvol -nodots 2>/dev/null | grep emcpower | awk -F: {'print $1 $6 $7'} | sort -k2 || echo "${INQ} does not exist or is not executable."
+}
+
+function no-expire () {
+  USER=$1
+  sudo /usr/bin/chage -m 1 -M 99999 $USER
+  sudo /usr/sbin/usermod -U $USER
+}
+
+# pause 'Press any key to continuu...'
+function pause() {
+  read -p "$*"
+}
+
+# Bash function to create a zeroed sparse file (expects a non negative integer as input)
+function createsparsefile ()
+{
+  TIMESTAMP=`date +%Y%m%d%H%M%S`
+  FILENAME=created_sparse_file_${TIMESTAMP}
+
+  test $1 -ge 0 && dd if=/dev/zero of=${FILENAME} bs=1M count=0 seek=$1 || echo "Your input was not a numeric value greater than 0"
+}
+
+function calc ()
+{
+  awk "BEGIN{ print $* }" ;
+}
+
+function mean_max_min ()
+{
+  awk 'NR == 1 { max=$1; min=$1; sum=0 } { if ($1>max) max=$1; if ($1<min) min=$1; sum+=$1;} END {printf "Min: %f\tMax: %f\tAverage: %f\n", min, max, sum/NR}'
+}
+
+# One-liner web server using python
+function websrv ()
+{
+  ( test $1 -gt 0 && test $1 -lt 65536 ) && python -m SimpleHTTPServer $1 || echo "Your input was not a port > 0 and < 65536"
+}
+
+function uri_escape()
+{
+  echo -E "$@" | sed 's/\\/\\\\/g;s/./&\n/g' | while read -r i; do echo $i | grep -q '[a-zA-Z0-9/.:?&=]' && echo -n "$i" || printf %%%x \'"$i"; done
+}
+
+function random_file()
+{
+  dd if=/dev/urandom of="${1}MBfile" bs=1M count=$1
+}
+
+function tzmulti ()
+{
+  TZ="US/Pacific" date
+  TZ="US/Central" date
+  TZ="US/Eastern" date
+  TZ="UTC" date
+  TZ="Europe/Berlin" date
+}
 
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
