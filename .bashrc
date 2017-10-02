@@ -475,6 +475,58 @@ function tzmulti ()
   TZ="Europe/Berlin" date
 }
 
+function heapdump {
+  PID=$1
+  USERNAME="`ps --no-header -p ${PID} -o user`"
+  if [[ $? -ne 0 ]]; then
+    echo "PID ${PID} does not exist!"
+    return 1
+  fi
+  STAMP="`date +%Y%m%d-%H%M%S`_`hostname -s`"
+  DUMPFILE="${STAMP}-heap.bin"
+  sudo su - ${USERNAME} -c "/usr/java/latest/bin/jmap -dump:format=b,file=${DUMPFILE} ${PID}" && echo "Heap dumped to ${DUMPFILE}" >&2 || echo "Problem during attempt to dump heap!" >&2
+  #echo "Heap dumped to ${DUMPFILE}" >&2
+}
+
+function threaddump {
+  PID=$1
+
+  STAMP="`date +%Y%m%d-%H%M%S`_`hostname -s`"
+  DUMPFILE="${STAMP}-threaddump.log"
+  USERNAME="`ps --no-header -p ${PID} -o user`"
+  if [[ $? -ne 0 ]]; then
+    echo "PID ${PID} does not exist!"
+    return 1
+  fi
+  sudo su - ${USERNAME} -c "/usr/java/latest/bin/jstack ${PID}" > ${DUMPFILE} && echo "Thread dump written to ${DUMPFILE}" >&2 || echo "Problem during attempt to dump threads!" >&2
+  #echo "Thread dump written to ${DUMPFILE}" >&2
+}
+
+function atom-threaddump {
+  PID=`/bin/ps --no-headers -o pid,cmd -C java | grep Container | awk {'print $1'}`
+  threaddump $PID
+}
+
+function atom-heapdump {
+  PID=`/bin/ps --no-headers -o pid,cmd -C java | grep Container | awk {'print $1'}`
+  heapdump $PID
+}
+
+function plat-threaddump {
+  PID=`/bin/ps --no-headers -o pid,cmd -C java | grep jetty | awk {'print $1'}`
+  threaddump $PID
+}
+
+function plat-heapdump {
+  PID=`/bin/ps --no-headers -o pid,cmd -C java | grep jetty | awk {'print $1'}`
+  heapdump $PID
+}
+
+function atom-pause {
+  PID=`/bin/ps --no-headers -o pid,cmd -C java | grep Container | awk {'print $1'}`
+  USERNAME="`ps --no-header -p ${PID} -o user`"
+  sudo su - ${USERNAME} -c "/usr/local/boomi/cloud/jmxutil/jmx_invoke.sh ${PID} com.boomi.container.services:type=ContainerController changeStatusAsync PAUSED_FOR_STOP"
+}
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
