@@ -189,3 +189,13 @@ function getwwn () {
     [ -n "${TEXT}" ] && echo "${TEXT}"
   done
 }
+
+# tailoing vi
+if [ -x /usr/bin/vim ]; then
+  alias vi='/usr/bin/vim'
+  export EDITOR="/usr/bin/vim"
+elif [ -x /bin/vi ]; then
+  export EDITOR="/bin/vi"
+elif [ -x /usr/bin/vi ]; then
+  export EDITOR="/usr/bin/vi"
+fi
