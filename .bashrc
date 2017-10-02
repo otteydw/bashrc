@@ -169,8 +169,10 @@ alias usermod='/usr/sbin/usermod'
 alias userdel='/usr/sbin/userdel'
 
 # tailoring 'less'
-alias less='less -IX'
-alias more='less -IX'
+if ! [ -f /etc/debian_version ]; then
+  alias less='less -IX'
+  alias more='less -IX'
+fi
 which most >/dev/null 2>&1 && {
   export PAGER="most"
 } || {
