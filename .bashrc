@@ -870,6 +870,11 @@ do
   [ -d ${DIR} ] && export MANPATH="${DIR}:${MANPATH}"
 done
 
+# Expand the history size
+HISTFILESIZE=100000000
+HISTSIZE=100000
+export HISTTIMEFORMAT="%h/%d - %H:%M:%S "
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
