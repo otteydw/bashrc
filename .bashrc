@@ -312,5 +312,7 @@ function certftpinspect {
   openssl s_client -showcerts -connect $1 -starttls ftp </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl x509 -text -noout
 }
 
+export SSHOPTS="-XAC -t -o ConnectTimeout=30"
+
 # Source a local bashrc if one exists.
 [ -e ${HOME}/.bashrc.local ] && source ${HOME}/.bashrc.local
