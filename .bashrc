@@ -223,3 +223,42 @@ function random_text_password () {
     return 1
   fi
 }
+
+new_password () {
+  NEW_USER=$1
+  PASSWORD=`random_password`
+  echo $PASSWORD | sudo /usr/bin/passwd --stdin $NEW_USER
+  sudo usermod -L $NEW_USER
+  sudo chage -d 0 $NEW_USER
+  sudo usermod -U $NEW_USER
+  echo "Username: $NEW_USER"
+  echo "Password: $PASSWORD"
+}
+
+reset_password () {
+  NEW_USER=$1
+  PASSWORD='password'
+  echo $PASSWORD | sudo /usr/bin/passwd --stdin $NEW_USER
+  sudo usermod -L $NEW_USER
+  sudo chage -d 0 $NEW_USER
+  sudo usermod -U $NEW_USER
+  echo "Username: $NEW_USER"
+  echo "Password: $PASSWORD"
+}
+
+new_user () {
+  if [ $# -ne 2 ]; then
+    echo "new_user requires two args"
+    exit 1
+  fi
+  NEW_USER=$1
+  NEW_UID=$2
+  sudo useradd -u $NEW_UID $NEW_USER
+  reset_password $NEW_USER
+  PASSWORD=`random_password`
+  echo $PASSWORD | sudo /usr/sbin/passwd --stdin $NEW_USER
+  sudo usermod -L $NEW_USER
+  sudo chage -d 0 $NEW_USER
+  sudo usermod -U $NEW_USER
+  echo "User $NEW_USER created with password $PASSWORD"
+}
