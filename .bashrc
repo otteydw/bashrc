@@ -328,6 +328,24 @@ function certftpinspect {
   openssl s_client -showcerts -connect $1 -starttls ftp </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl x509 -text -noout
 }
 
+function compare_key_and_cert ()
+{
+  KEY=$1
+  CERT=$2
+  KEY_SUM=`openssl rsa -noout -modulus -in ${KEY} | openssl md5`
+  CERT_SUM=`openssl x509 -noout -modulus -in ${CERT} | openssl md5`
+  openssl x509 -in ${CERT} -noout -subject -dates
+  echo "${KEY} - ${KEY_SUM}"
+  echo "${CERT} - ${CERT_SUM}"
+  if [ "${KEY_SUM}" = "${CERT_SUM}" ]; then
+    echo "Match!"
+    return 0
+  else
+    echo "Mismatch!"
+    return 1
+  fi
+}
+
 # Function to remove comments from a file. (expects a file name as input)
 function remove_comments () {
   grep -v '^#' $1 | grep -v '^$'
