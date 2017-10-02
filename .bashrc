@@ -856,6 +856,16 @@ function sar_8hours ()
 #   export IFS=$(echo -en "\n\b")
 # }
 
+# Create a .screenrc file if it doesn't exist
+SCREENRC="${HOME}/.screenrc"
+alias get_screenrc="curl -s -o ${SCREENRC} https://otteydw.keybase.pub/linux/.screenrc"
+[ -f "${SCREENRC}" ] || get_screenrc
+
+# Create a .vimrc file if it doesn't exist
+VIMRC="${HOME}/.vimrc"
+alias get_vimrc="curl -s -o ${VIMRC} https://otteydw.keybase.pub/linux/.vimrc"
+[ -f "${VIMRC}" ] || get_vimrc
+
 # Send a test email
 function testmail () {
   MESSAGE="Test from ${MY_HOSTNAME}"
