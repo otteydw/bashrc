@@ -332,3 +332,6 @@ export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
 [ -e ${HOME}/.bashrc.local ] && source ${HOME}/.bashrc.local
+
+# Display uptime on login
+#[ -e /usr/bin/uptime ] && echo && /usr/bin/uptime && echo
