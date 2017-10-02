@@ -199,3 +199,27 @@ elif [ -x /bin/vi ]; then
 elif [ -x /usr/bin/vi ]; then
   export EDITOR="/usr/bin/vi"
 fi
+
+function random_password () {
+  COUNT=$1
+  [ -z "$COUNT" ] && COUNT=16
+  command -v pwgen >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    pwgen -sy -N1 ${COUNT}
+  else
+    PASSWORD=`cat /dev/urandom | tr -cd \!\@\#a-zA-Z0-9 | fold -w${COUNT} | head -n 1`
+    echo $PASSWORD
+  fi
+}
+
+function random_text_password () {
+  COUNT=$1
+  [ -z "$COUNT" ] && COUNT=16
+  command -v pwgen >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    pwgen -s -N1 ${COUNT}
+  else
+    echo "Please install pwgen!"
+    return 1
+  fi
+}
