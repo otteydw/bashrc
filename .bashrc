@@ -115,3 +115,34 @@ else
 
   PS1="[\$(date +%H%M%Z)]\[${LIGHT_RED}\][${PS_FILLER}]\[${LIGHT_CYAN}\][\u\[${YELLOW}\]@\h:\[${LIGHT_PURPLE}\]\w]\[${WHITE}\]$\[${WHITE}\]"
 fi
+
+# User specific aliases and functions
+alias l='ls -lih'
+alias which='type -all'
+alias path='echo -e ${PATH//:/\\n}'
+alias du='du -kh'
+alias lower='tr [:upper:] [:lower:]'
+alias upper='tr [:lower:] [:upper:]'
+
+# Assist in common typos
+alias Grep='grep'
+alias GRep='grep'
+alias GREp='grep'
+alias GREP='grep'
+
+# The 'ls' family (this assumes you use the GNU ls)
+[ "$MY_OS" = "SunOS" ] || alias ls='ls -hF --color'       # add colors for filetype recognition
+alias la='ls -Al'               # show hidden files
+alias lx='ls -lXB'              # sort by extension
+alias lk='ls -lSr'              # sort by size
+alias lc='ls -lcr'              # sort by change time
+alias lu='ls -lur'              # sort by access time
+alias lr='ls -lR'               # recursive ls
+alias lt='ls -ltr'              # sort by date
+alias lm='ls -al |more'         # pipe through 'more'
+alias tree='tree -Csu'          # nice alternative to 'ls'
+
+# These are aliases just because they're executable only by root and won't tab complete
+alias useradd='/usr/sbin/useradd'
+alias usermod='/usr/sbin/usermod'
+alias userdel='/usr/sbin/userdel'
