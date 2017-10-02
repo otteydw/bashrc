@@ -855,6 +855,7 @@ function is_aws {
     return 1
   fi
 }
+
 # function asm_header ()
 # {
 #   sudo dd if=$1 bs=512 count=1
