@@ -155,3 +155,24 @@ agt () {
 alias keyon="ssh-add -t 10800"
 alias keyoff='ssh-add -D'
 alias keylist='ssh-add -l'
+
+alias rescan='echo "- - -" | sudo tee /sys/class/scsi_host/host*/scan'
+
+function getwwn () {
+  for host in `/bin/ls /sys/class/scsi_host`;
+  do
+    if [ -e /sys/class/scsi_host/${host}/node_name ]; then
+      NODE_NAME="`cat /sys/class/scsi_host/${host}/node_name`"
+    elif [ -e /sys/class/fc_host/${host}/node_name ]; then
+      NODE_NAME="`cat /sys/class/fc_host/${host}/node_name`"
+    elif [ -e /sys/class/scsi_host/${host}/lpfc_symbolic_name ]; then
+      NODE_NAME="`cat /sys/class/scsi_host/${host}/lpfc_symbolic_name | sed -e 's|Emulex PPN-||'`"
+    else
+      NODE_NAME=""
+    fi
+    NODE_NAME=`echo ${NODE_NAME} | upper`
+    [ -e /sys/class/scsi_host/${host}/modeldesc ] && MODELDESC="     $(cat /sys/class/scsi_host/${host}/modeldesc)" || MODELDESC=""
+    TEXT="${NODE_NAME}${MODELDESC}"
+    [ -n "${TEXT}" ] && echo "${TEXT}"
+  done
+}
