@@ -858,6 +858,18 @@ function testmail () {
   fi
 }
 
+export PATH="/usr/local/sbin:/usr/sbin:/sbin:${PATH}"
+
+for DIR in ${HOME}/opt/bin /opt/dell/srvadmin/sbin /usr/local/scripts /usr/java/latest/bin /usr/java/latest/jre/bin /opt/dell/srvadmin/bin /opt/atlassian
+do
+  [ -d ${DIR} ] && export PATH="${DIR}:${PATH}"
+done
+
+for DIR in ${HOME}/opt/man ${HOME}/opt/share/man /usr/share/man
+do
+  [ -d ${DIR} ] && export MANPATH="${DIR}:${MANPATH}"
+done
+
 export SSHOPTS="-XAC -t -o ConnectTimeout=30"
 
 # Source a local bashrc if one exists.
