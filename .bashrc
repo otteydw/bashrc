@@ -147,6 +147,15 @@ alias useradd='/usr/sbin/useradd'
 alias usermod='/usr/sbin/usermod'
 alias userdel='/usr/sbin/userdel'
 
+# tailoring 'less'
+alias less='less -IX'
+alias more='less -IX'
+which most >/dev/null 2>&1 && {
+  export PAGER="most"
+} || {
+  export PAGER='less -IX'
+}
+
 # Aliases for the ssh agent
 agt () {
 	eval `ssh-agent`
