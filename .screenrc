@@ -1,0 +1,3 @@
+# Allow screen to run in full width
+# https://superuser.com/questions/217066/prevent-gnu-screen-from-resizing-display-size/217281#217281
+termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
