@@ -123,6 +123,10 @@ alias path='echo -e ${PATH//:/\\n}'
 alias du='du -kh'
 alias lower='tr [:upper:] [:lower:]'
 alias upper='tr [:lower:] [:upper:]'
+alias pass_sort='sort -t: -k3 -n /etc/passwd'
+alias nmap_verbose='sudo nmap -sS -O -v -A -p1-65535 -T5'
+alias hogs="ps -eo pcpu,pid,user,args | sort -r -k1 | less"
+alias pidinfo="sudo /bin/ps -o pid,lstart,command -p"
 
 # Assist in common typos
 alias Grep='grep'
