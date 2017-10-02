@@ -240,3 +240,6 @@ hoststamp () {
 hoststampss () {
   echo "$(date +%Y%m%d-%H%M%S)-$(hostname -s)"
 }
+
+# Source a local bashrc if one exists.
+[ -e ${HOME}/.bashrc.local ] && source ${HOME}/.bashrc.local
